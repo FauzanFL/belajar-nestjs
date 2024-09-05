@@ -3,6 +3,12 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { UserModule } from './user/user.module';
+import { RoomModule } from './room/room.module';
+import { ReservationModule } from './reservation/reservation.module';
+import { User } from './user/entities/user.entity';
+import { Room } from './room/entities/room.entity';
+import { Reservation } from './reservation/entities/reservation.entity';
 
 @Module({
   imports: [
@@ -16,11 +22,14 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
         username: configService.get('DB_USERNAME'),
         password: configService.get('DB_PASSWORD'),
         database: configService.get('DB_DATABASE'),
-        entities: [],
+        entities: [User, Room, Reservation],
         synchronize: true,
       }),
       inject: [ConfigService],
-    })
+    }),
+    UserModule,
+    RoomModule,
+    ReservationModule
   ],
   controllers: [AppController],
   providers: [AppService],
