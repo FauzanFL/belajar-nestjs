@@ -21,7 +21,7 @@ export class Room {
     type: RoomType;
 
     @Column({length: 20})
-    price: string;
+    price: number;
 
     @Column()
     ready: boolean;
