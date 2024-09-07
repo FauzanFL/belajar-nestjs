@@ -20,7 +20,7 @@ export class Room {
     @Column({type: "enum", enum: RoomType, default: RoomType.CASUAL})
     type: RoomType;
 
-    @Column({length: 20})
+    @Column()
     price: number;
 
     @Column()
