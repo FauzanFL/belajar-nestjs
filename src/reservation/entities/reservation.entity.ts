@@ -16,8 +16,8 @@ export class Reservation {
     @Column({length: 20})
     phone: string
     
-    @Column({length: 20})
-    total: string
+    @Column()
+    total: number
 
     @CreateDateColumn({type: "timestamp"})
     start: Date
