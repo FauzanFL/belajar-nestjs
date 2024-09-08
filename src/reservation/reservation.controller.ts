@@ -5,7 +5,7 @@ import { UpdateReservationDto } from './dto/update-reservation.dto';
 import { UserService } from 'src/user/user.service';
 import { RoomService } from 'src/room/room.service';
 
-@Controller('reservation')
+@Controller('api/reservations')
 export class ReservationController {
   constructor(private readonly reservationService: ReservationService, private readonly userService: UserService, private readonly roomService: RoomService) {}
 
