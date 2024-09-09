@@ -15,7 +15,7 @@ export class ReservationService {
     const newReservation = {...createReservationDto}
     newReservation.roomId = room.id
     newReservation.userId = user.id
-    return await this.reservationRepository.create(newReservation);
+    return await this.reservationRepository.save(newReservation);
   }
 
   async findAll(): Promise<Reservation[]> {

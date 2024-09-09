@@ -11,7 +11,7 @@ export class RoomController {
 
   @Post()
   async create(@Body() createRoomDto: CreateRoomDto) {
-    return await this.roomService.create(createRoomDto);
+    return await this.roomService.save(createRoomDto);
   }
 
   @Get()

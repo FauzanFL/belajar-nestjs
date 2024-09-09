@@ -3,6 +3,7 @@ import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { ApiTags } from '@nestjs/swagger';
+import { hash } from 'bcrypt';
 
 @Controller('api/users')
 @ApiTags('user')
@@ -11,7 +12,10 @@ export class UserController {
 
   @Post()
   async create(@Body() createUserDto: CreateUserDto) {
-    return await this.userService.create(createUserDto);
+    const passwordEncrypt = await hash(createUserDto.password, 10)
+    const data = {...createUserDto}
+    data.password = passwordEncrypt
+    return await this.userService.create(data);
   }
 
   @Get()
@@ -26,7 +30,12 @@ export class UserController {
 
   @Patch(':id')
   async update(@Param('id', ParseIntPipe) id: number, @Body() updateUserDto: UpdateUserDto) {
-    return await this.userService.update(+id, updateUserDto);
+    const data = {...updateUserDto}
+    if(updateUserDto.password) {
+      const passwordEncrypt = await hash(updateUserDto.password, 10)
+      data.password = passwordEncrypt
+    }
+    return await this.userService.update(+id, data);
   }
 
   @Delete(':id')
