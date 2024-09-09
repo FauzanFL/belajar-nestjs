@@ -4,8 +4,10 @@ import { CreateReservationDto } from './dto/create-reservation.dto';
 import { UpdateReservationDto } from './dto/update-reservation.dto';
 import { UserService } from 'src/user/user.service';
 import { RoomService } from 'src/room/room.service';
+import { ApiTags } from '@nestjs/swagger';
 
 @Controller('api/reservations')
+@ApiTags('reservation')
 export class ReservationController {
   constructor(private readonly reservationService: ReservationService, private readonly userService: UserService, private readonly roomService: RoomService) {}
 
