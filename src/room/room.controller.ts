@@ -11,7 +11,8 @@ export class RoomController {
 
   @Post()
   async create(@Body(new ValidationPipe()) createRoomDto: CreateRoomDto) {
-    await this.roomService.create(createRoomDto)
+    const data = {...createRoomDto, ready: true}
+    await this.roomService.create(data)
     return {message: "Room created successfully"};
   }
 

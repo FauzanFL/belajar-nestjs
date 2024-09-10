@@ -1,6 +1,6 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { RoomType } from "../entities/room.entity";
-import { IsBoolean, IsEnum, IsNotEmpty, IsNumber, Length } from "class-validator";
+import { IsEnum, IsNotEmpty, IsNumber, Length } from "class-validator";
 
 export class CreateRoomDto {
     @ApiProperty()
@@ -22,9 +22,4 @@ export class CreateRoomDto {
     @IsNotEmpty()
     @IsNumber()
     price: number;
-    
-    @ApiProperty()
-    @IsNotEmpty()
-    @IsBoolean()
-    ready: boolean;
 }
