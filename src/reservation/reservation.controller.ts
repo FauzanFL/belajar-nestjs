@@ -21,7 +21,8 @@ export class ReservationController {
     if (!user) {
       throw new HttpException("user not found", HttpStatus.NOT_FOUND)
     }
-    return await this.reservationService.create(createReservationDto, room, user);
+    await this.reservationService.create(createReservationDto, room, user)
+    return {message: "Reservation created successfully"};
   }
 
   @Get()
@@ -44,7 +45,8 @@ export class ReservationController {
     if (!reservation) {
       throw new HttpException("reservation not found", HttpStatus.NOT_FOUND)
     }
-    return await this.reservationService.update(+id, updateReservationDto);
+    await this.reservationService.update(+id, updateReservationDto)
+    return {message: "Reservation updated successfully"};
   }
 
   @Delete(':id')
@@ -53,6 +55,7 @@ export class ReservationController {
     if (!reservation) {
       throw new HttpException("reservation not found", HttpStatus.NOT_FOUND)
     }
-    return await this.reservationService.remove(+id);
+    await this.reservationService.remove(id)
+    return {message: "Reservation deleted successfully"};
   }
 }

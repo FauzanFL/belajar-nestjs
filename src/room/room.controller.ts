@@ -11,7 +11,8 @@ export class RoomController {
 
   @Post()
   async create(@Body(new ValidationPipe()) createRoomDto: CreateRoomDto) {
-    return await this.roomService.create(createRoomDto);
+    await this.roomService.create(createRoomDto)
+    return {message: "Room created successfully"};
   }
 
   @Get()
@@ -34,7 +35,8 @@ export class RoomController {
     if (!room) {
       throw new HttpException("room not found", HttpStatus.NOT_FOUND)
     }
-    return await this.roomService.update(id, updateRoomDto);
+    await this.roomService.update(id, updateRoomDto)
+    return {message: "Room updated successfully"};
   }
 
   @Delete(':id')
@@ -43,6 +45,7 @@ export class RoomController {
     if (!room) {
       throw new HttpException("room not found", HttpStatus.NOT_FOUND)
     }
-    return await this.roomService.remove(id);
+    await this.roomService.remove(id)
+    return {message: "Room deleted successfully"};
   }
 }

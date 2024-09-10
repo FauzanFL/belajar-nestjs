@@ -12,14 +12,15 @@ export class UserController {
 
   @Post()
   async create(@Body(new ValidationPipe()) createUserDto: CreateUserDto) {
-    const user = this.userService.findByUsername(createUserDto.username)
+    const user = await this.userService.findByUsername(createUserDto.username)
     if (user) {
       throw new HttpException("username has been taken", HttpStatus.BAD_REQUEST)
     }
     const passwordEncrypt = await hash(createUserDto.password, 10)
     const data = {...createUserDto}
     data.password = passwordEncrypt
-    return await this.userService.create(data);
+    await this.userService.create(data)
+    return {message: "User created successfully"};
   }
 
   @Get()
@@ -55,7 +56,9 @@ export class UserController {
       const passwordEncrypt = await hash(updateUserDto.password, 10)
       data.password = passwordEncrypt
     }
-    return await this.userService.update(id, data);
+
+    await this.userService.update(id, data)
+    return {message: "User updated successfully"};
   }
 
   @Delete(':id')
@@ -64,6 +67,7 @@ export class UserController {
     if (!user) {
       throw new HttpException("user not found", HttpStatus.NOT_FOUND)
     }
-    return await this.userService.remove(id);
+    await this.userService.remove(id)
+    return {message: "User deleted successfully"};
   }
 }
