@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe, HttpException, HttpStatus } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe, HttpException, HttpStatus, ValidationPipe } from '@nestjs/common';
 import { ReservationService } from './reservation.service';
 import { CreateReservationDto } from './dto/create-reservation.dto';
 import { UpdateReservationDto } from './dto/update-reservation.dto';
@@ -12,7 +12,7 @@ export class ReservationController {
   constructor(private readonly reservationService: ReservationService, private readonly userService: UserService, private readonly roomService: RoomService) {}
 
   @Post()
-  async create(@Body() createReservationDto: CreateReservationDto) {
+  async create(@Body(new ValidationPipe()) createReservationDto: CreateReservationDto) {
     const room = await this.roomService.findOne(createReservationDto.roomId)
     if (!room) {
       throw new HttpException("room not found", HttpStatus.NOT_FOUND)
@@ -39,7 +39,7 @@ export class ReservationController {
   }
 
   @Patch(':id')
-  async update(@Param('id', ParseIntPipe) id: number, @Body() updateReservationDto: UpdateReservationDto) {
+  async update(@Param('id', ParseIntPipe) id: number, @Body(new ValidationPipe()) updateReservationDto: UpdateReservationDto) {
     const reservation = await this.reservationService.findOne(id)
     if (!reservation) {
       throw new HttpException("reservation not found", HttpStatus.NOT_FOUND)

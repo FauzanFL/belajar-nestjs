@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe, HttpException, HttpStatus } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe, HttpException, HttpStatus, ValidationPipe } from '@nestjs/common';
 import { RoomService } from './room.service';
 import { CreateRoomDto } from './dto/create-room.dto';
 import { UpdateRoomDto } from './dto/update-room.dto';
@@ -10,7 +10,7 @@ export class RoomController {
   constructor(private readonly roomService: RoomService) {}
 
   @Post()
-  async create(@Body() createRoomDto: CreateRoomDto) {
+  async create(@Body(new ValidationPipe()) createRoomDto: CreateRoomDto) {
     return await this.roomService.create(createRoomDto);
   }
 
@@ -29,7 +29,7 @@ export class RoomController {
   }
 
   @Patch(':id')
-  async update(@Param('id', ParseIntPipe) id: number, @Body() updateRoomDto: UpdateRoomDto) {
+  async update(@Param('id', ParseIntPipe) id: number, @Body(new ValidationPipe()) updateRoomDto: UpdateRoomDto) {
     const room = await this.roomService.findOne(id)
     if (!room) {
       throw new HttpException("room not found", HttpStatus.NOT_FOUND)
