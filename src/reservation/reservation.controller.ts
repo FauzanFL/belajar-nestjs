@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe, HttpException, HttpStatus } from '@nestjs/common';
 import { ReservationService } from './reservation.service';
 import { CreateReservationDto } from './dto/create-reservation.dto';
 import { UpdateReservationDto } from './dto/update-reservation.dto';
@@ -14,27 +14,45 @@ export class ReservationController {
   @Post()
   async create(@Body() createReservationDto: CreateReservationDto) {
     const room = await this.roomService.findOne(createReservationDto.roomId)
+    if (!room) {
+      throw new HttpException("room not found", HttpStatus.NOT_FOUND)
+    }
     const user = await this.userService.findOne(createReservationDto.userId)
+    if (!user) {
+      throw new HttpException("user not found", HttpStatus.NOT_FOUND)
+    }
     return await this.reservationService.create(createReservationDto, room, user);
   }
 
   @Get()
-  findAll() {
-    return this.reservationService.findAll();
+  async findAll() {
+    return await this.reservationService.findAll();
   }
 
   @Get(':id')
-  findOne(@Param('id', ParseIntPipe) id: number) {
-    return this.reservationService.findOne(+id);
+  async findOne(@Param('id', ParseIntPipe) id: number) {
+    const reservation = await this.reservationService.findOne(id)
+    if (!reservation) {
+      throw new HttpException("reservation not found", HttpStatus.NOT_FOUND)
+    }
+    return reservation;
   }
 
   @Patch(':id')
-  update(@Param('id', ParseIntPipe) id: number, @Body() updateReservationDto: UpdateReservationDto) {
-    return this.reservationService.update(+id, updateReservationDto);
+  async update(@Param('id', ParseIntPipe) id: number, @Body() updateReservationDto: UpdateReservationDto) {
+    const reservation = await this.reservationService.findOne(id)
+    if (!reservation) {
+      throw new HttpException("reservation not found", HttpStatus.NOT_FOUND)
+    }
+    return await this.reservationService.update(+id, updateReservationDto);
   }
 
   @Delete(':id')
-  remove(@Param('id', ParseIntPipe) id: number) {
-    return this.reservationService.remove(+id);
+  async remove(@Param('id', ParseIntPipe) id: number) {
+    const reservation = await this.reservationService.findOne(id)
+    if (!reservation) {
+      throw new HttpException("reservation not found", HttpStatus.NOT_FOUND)
+    }
+    return await this.reservationService.remove(+id);
   }
 }
