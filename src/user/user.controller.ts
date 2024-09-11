@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe, HttpException, HttpStatus, ValidationPipe } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe, HttpException, HttpStatus, ValidationPipe, Res } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -7,6 +7,7 @@ import { compare, hash } from 'bcrypt';
 import { LoginUserDto } from './dto/login-user.dto';
 import { sign } from 'jsonwebtoken';
 import { ConfigService } from '@nestjs/config';
+import { Response } from 'express';
 
 @Controller('api/users')
 @ApiTags('user')
@@ -74,8 +75,8 @@ export class UserController {
     return {message: "User deleted successfully"};
   }
 
-  @Post()
-  async login(@Body() loginUserDto: LoginUserDto) {
+  @Post('/login')
+  async login(@Res({passthrough: true}) res: Response, @Body(new ValidationPipe()) loginUserDto: LoginUserDto) {
     const user = await this.userService.findByUsername(loginUserDto.username)
     if (!user) {
       throw new HttpException("username or password is wrong", HttpStatus.BAD_REQUEST)
@@ -89,13 +90,21 @@ export class UserController {
     const token = await sign({id: user.id}, this.configService.get('JWT_SECRET'))
 
     // set cookie
+    res.cookie("token", token, {
+      secure: true,
+      httpOnly: true,
+      expires: new Date(Date.now() + 1000 * 60 * 60 * 12)
+    })
 
     return {message: "Login successful", token}
   }
 
-  @Get()
-  async logout() {
+  @Post('logout')
+  async logout(@Res({passthrough: true}) res: Response) {
     // remove cookie
+    res.cookie("token", "", {
+      expires: new Date(Date.now() - 1000 * 60 * 60)
+    })
 
     return {message: "Logout succcessful"}
   }
