@@ -3,12 +3,15 @@ import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { ApiTags } from '@nestjs/swagger';
-import { hash } from 'bcrypt';
+import { compare, hash } from 'bcrypt';
+import { LoginUserDto } from './dto/login-user.dto';
+import { sign } from 'jsonwebtoken';
+import { ConfigService } from '@nestjs/config';
 
 @Controller('api/users')
 @ApiTags('user')
 export class UserController {
-  constructor(private readonly userService: UserService) {}
+  constructor(private readonly userService: UserService, private configService: ConfigService) {}
 
   @Post()
   async create(@Body(new ValidationPipe()) createUserDto: CreateUserDto) {
@@ -69,5 +72,31 @@ export class UserController {
     }
     await this.userService.remove(id)
     return {message: "User deleted successfully"};
+  }
+
+  @Post()
+  async login(@Body() loginUserDto: LoginUserDto) {
+    const user = await this.userService.findByUsername(loginUserDto.username)
+    if (!user) {
+      throw new HttpException("username or password is wrong", HttpStatus.BAD_REQUEST)
+    }
+
+    const isPasswordMatch = await compare(loginUserDto.password, user.password)
+    if (!isPasswordMatch) {
+      throw new HttpException("username or password is wrong", HttpStatus.BAD_REQUEST)
+    }
+
+    const token = await sign({id: user.id}, this.configService.get('JWT_SECRET'))
+
+    // set cookie
+
+    return {message: "Login successful", token}
+  }
+
+  @Get()
+  async logout() {
+    // remove cookie
+
+    return {message: "Logout succcessful"}
   }
 }
