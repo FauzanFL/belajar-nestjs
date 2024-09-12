@@ -1,10 +1,12 @@
 import { Body, Controller, HttpCode, HttpException, HttpStatus, Post, Res, ValidationPipe } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { ApiTags } from '@nestjs/swagger';
-import { compare } from 'bcrypt';
+import { compare, hash } from 'bcrypt';
 import { Response } from 'express';
 import { UserService } from 'src/user/user.service';
 import { LoginUserDto } from './dto/login-user.dto';
+import { UserRole } from 'src/user/entities/user.entity';
+import { RegisterUserDto } from './dto/register-user.dto';
 
 @Controller('api/auth')
 @ApiTags('auth')
@@ -13,8 +15,21 @@ export class AuthController {
         private readonly userService: UserService,
         private jwtService: JwtService
     ){}
+
+    @Post('register')
+    async register(@Body(new ValidationPipe()) createUserDto: RegisterUserDto) {
+        const user = await this.userService.findByUsername(createUserDto.username)
+        if (user) {
+        throw new HttpException("username has been taken", HttpStatus.BAD_REQUEST)
+        }
+        const passwordEncrypt = await hash(createUserDto.password, 10)
+        const data = {...createUserDto, role: UserRole.USER}
+        data.password = passwordEncrypt
+        await this.userService.create(data)
+        return {message: "User created successfully"};
+    }
     
-    @Post('/login')
+    @Post('login')
     @HttpCode(200)
     async login(@Res({passthrough: true}) res: Response, @Body(new ValidationPipe()) loginUserDto: LoginUserDto) {
         const user = await this.userService.findByUsername(loginUserDto.username)

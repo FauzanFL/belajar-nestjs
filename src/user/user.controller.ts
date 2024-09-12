@@ -4,7 +4,6 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { ApiTags } from '@nestjs/swagger';
 import { hash } from 'bcrypt';
-import { UserRole } from './entities/user.entity';
 
 @Controller('api/users')
 @ApiTags('user')
@@ -20,7 +19,7 @@ export class UserController {
       throw new HttpException("username has been taken", HttpStatus.BAD_REQUEST)
     }
     const passwordEncrypt = await hash(createUserDto.password, 10)
-    const data = {...createUserDto, role: UserRole.USER}
+    const data = {...createUserDto}
     data.password = passwordEncrypt
     await this.userService.create(data)
     return {message: "User created successfully"};
