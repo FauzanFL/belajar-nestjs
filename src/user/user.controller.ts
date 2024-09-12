@@ -105,9 +105,7 @@ export class UserController {
   @Post('logout')
   async logout(@Res({passthrough: true}) res: Response) {
     // remove cookie
-    res.cookie("token", "", {
-      expires: new Date(Date.now() - 1000 * 60 * 60)
-    })
+    res.clearCookie('token')
 
     return {message: "Logout succcessful"}
   }
