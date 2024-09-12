@@ -5,14 +5,17 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { ApiTags } from '@nestjs/swagger';
 import { compare, hash } from 'bcrypt';
 import { LoginUserDto } from './dto/login-user.dto';
-import { sign } from 'jsonwebtoken';
-import { ConfigService } from '@nestjs/config';
 import { Response } from 'express';
+import { UserRole } from './entities/user.entity';
+import { JwtService } from '@nestjs/jwt';
 
 @Controller('api/users')
 @ApiTags('user')
 export class UserController {
-  constructor(private readonly userService: UserService, private configService: ConfigService) {}
+  constructor(
+    private readonly userService: UserService,
+    private jwtService: JwtService
+  ) {}
 
   @Post()
   async create(@Body(new ValidationPipe()) createUserDto: CreateUserDto) {
@@ -21,7 +24,7 @@ export class UserController {
       throw new HttpException("username has been taken", HttpStatus.BAD_REQUEST)
     }
     const passwordEncrypt = await hash(createUserDto.password, 10)
-    const data = {...createUserDto}
+    const data = {...createUserDto, role: UserRole.USER}
     data.password = passwordEncrypt
     await this.userService.create(data)
     return {message: "User created successfully"};
@@ -87,7 +90,7 @@ export class UserController {
       throw new HttpException("username or password is wrong", HttpStatus.BAD_REQUEST)
     }
 
-    const token = await sign({id: user.id}, this.configService.get('JWT_SECRET'))
+    const token = await this.jwtService.signAsync({id: user.id})
 
     // set cookie
     res.cookie("token", token, {

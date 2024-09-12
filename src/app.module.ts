@@ -9,6 +9,7 @@ import { ReservationModule } from './reservation/reservation.module';
 import { User } from './user/entities/user.entity';
 import { Room } from './room/entities/room.entity';
 import { Reservation } from './reservation/entities/reservation.entity';
+import { JwtModule } from '@nestjs/jwt';
 
 @Module({
   imports: [
@@ -26,6 +27,12 @@ import { Reservation } from './reservation/entities/reservation.entity';
         synchronize: true,
       }),
       inject: [ConfigService],
+    }),
+    JwtModule.registerAsync({
+      imports: [ConfigModule],
+      useFactory: (configService: ConfigService) => ({
+        secret: configService.get('JWT_SECRET')
+      })
     }),
     UserModule,
     RoomModule,
