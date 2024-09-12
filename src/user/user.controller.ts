@@ -1,20 +1,16 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe, HttpException, HttpStatus, ValidationPipe, Res } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe, HttpException, HttpStatus, ValidationPipe } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { ApiTags } from '@nestjs/swagger';
-import { compare, hash } from 'bcrypt';
-import { LoginUserDto } from './dto/login-user.dto';
-import { Response } from 'express';
+import { hash } from 'bcrypt';
 import { UserRole } from './entities/user.entity';
-import { JwtService } from '@nestjs/jwt';
 
 @Controller('api/users')
 @ApiTags('user')
 export class UserController {
   constructor(
     private readonly userService: UserService,
-    private jwtService: JwtService
   ) {}
 
   @Post()
@@ -76,37 +72,5 @@ export class UserController {
     }
     await this.userService.remove(id)
     return {message: "User deleted successfully"};
-  }
-
-  @Post('/login')
-  async login(@Res({passthrough: true}) res: Response, @Body(new ValidationPipe()) loginUserDto: LoginUserDto) {
-    const user = await this.userService.findByUsername(loginUserDto.username)
-    if (!user) {
-      throw new HttpException("username or password is wrong", HttpStatus.BAD_REQUEST)
-    }
-
-    const isPasswordMatch = await compare(loginUserDto.password, user.password)
-    if (!isPasswordMatch) {
-      throw new HttpException("username or password is wrong", HttpStatus.BAD_REQUEST)
-    }
-
-    const token = await this.jwtService.signAsync({id: user.id})
-
-    // set cookie
-    res.cookie("token", token, {
-      secure: true,
-      httpOnly: true,
-      expires: new Date(Date.now() + 1000 * 60 * 60 * 12)
-    })
-
-    return {message: "Login successful", token}
-  }
-
-  @Post('logout')
-  async logout(@Res({passthrough: true}) res: Response) {
-    // remove cookie
-    res.clearCookie('token')
-
-    return {message: "Logout succcessful"}
   }
 }

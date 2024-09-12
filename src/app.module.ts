@@ -10,6 +10,7 @@ import { User } from './user/entities/user.entity';
 import { Room } from './room/entities/room.entity';
 import { Reservation } from './reservation/entities/reservation.entity';
 import { JwtModule } from '@nestjs/jwt';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -33,11 +34,13 @@ import { JwtModule } from '@nestjs/jwt';
       useFactory: (configService: ConfigService) => ({
         secret: configService.get('JWT_SECRET'),
         signOptions: {expiresIn: '12h'}
-      })
+      }),
+      inject: [ConfigService]
     }),
     UserModule,
     RoomModule,
-    ReservationModule
+    ReservationModule,
+    AuthModule
   ],
   controllers: [AppController],
   providers: [AppService],

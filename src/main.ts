@@ -7,6 +7,10 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.use(cookieParser())
 
+  app.enableCors({
+    credentials: true
+  })
+
   const config = new DocumentBuilder()
   .setTitle("Room reservation")
   .setDescription("API for room reservation")
