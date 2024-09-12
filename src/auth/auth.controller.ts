@@ -34,9 +34,9 @@ export class AuthController {
     async login(@Res({passthrough: true}) res: Response, @Body(new ValidationPipe()) loginUserDto: LoginUserDto) {
         const user = await this.userService.findByUsername(loginUserDto.username)
         if (!user) {
-        throw new HttpException("username or password is wrong", HttpStatus.BAD_REQUEST)
+            throw new HttpException("username or password is wrong", HttpStatus.BAD_REQUEST)
         }
-
+        
         const isPasswordMatch = await compare(loginUserDto.password, user.password)
         if (!isPasswordMatch) {
         throw new HttpException("username or password is wrong", HttpStatus.BAD_REQUEST)

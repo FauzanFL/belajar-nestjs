@@ -35,6 +35,7 @@ import { AuthModule } from './auth/auth.module';
         secret: configService.get('JWT_SECRET'),
         signOptions: {expiresIn: '12h'}
       }),
+      global: true,
       inject: [ConfigService]
     }),
     UserModule,
