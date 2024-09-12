@@ -3,14 +3,17 @@ import { RoomService } from './room.service';
 import { CreateRoomDto } from './dto/create-room.dto';
 import { UpdateRoomDto } from './dto/update-room.dto';
 import { ApiTags } from '@nestjs/swagger';
-import { AuthGuard } from 'src/guards/auth.guard';
+import { AuthenticationGuard } from 'src/guards/authentication.guard';
+import { Role } from 'src/decorators/roles.decorator';
+import { AuthorizationGuard } from 'src/guards/authorization.guard';
 
 @Controller('api/rooms')
 @ApiTags('room')
 export class RoomController {
   constructor(private readonly roomService: RoomService) {}
-
-  @UseGuards(AuthGuard)
+  
+  @Role('admin')
+  @UseGuards(AuthenticationGuard, AuthorizationGuard)
   @Post()
   async create(@Body(new ValidationPipe()) createRoomDto: CreateRoomDto) {
     const data = {...createRoomDto, ready: true}
@@ -32,7 +35,8 @@ export class RoomController {
     return room;
   }
 
-  @UseGuards(AuthGuard)
+  @Role('admin')
+  @UseGuards(AuthenticationGuard, AuthorizationGuard)
   @Patch(':id')
   async update(@Param('id', ParseIntPipe) id: number, @Body(new ValidationPipe()) updateRoomDto: UpdateRoomDto) {
     const room = await this.roomService.findOne(id)
@@ -43,7 +47,8 @@ export class RoomController {
     return {message: "Room updated successfully"};
   }
 
-  @UseGuards(AuthGuard)
+  @Role('admin')
+  @UseGuards(AuthenticationGuard, AuthorizationGuard)
   @Delete(':id')
   async remove(@Param('id', ParseIntPipe) id: number) {
     const room = await this.roomService.findOne(id)

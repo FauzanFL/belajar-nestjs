@@ -4,18 +4,18 @@ import { Request } from "express";
 import { Observable } from "rxjs";
 
 @Injectable()
-export class AuthGuard implements CanActivate {
+export class AuthenticationGuard implements CanActivate {
     constructor (private jwtService: JwtService){}
 
     canActivate(context: ExecutionContext): boolean | Promise<boolean> | Observable<boolean> {
-        const request: Request = context.switchToHttp().getRequest();
-        const token = this.extractTokenFromHeader(request)
-        if (!token) {
-            throw new UnauthorizedException('Invalid token');
-        }
-        
         try {
-            this.jwtService.verify(token)
+            const request = context.switchToHttp().getRequest();
+            const token = this.extractTokenFromHeader(request)
+            if (!token) {
+                throw new UnauthorizedException('Invalid token');
+            }
+            
+            request.user = this.jwtService.verify(token)
         } catch(e) {
             Logger.error(e.message)
             throw new UnauthorizedException('Invalid token');

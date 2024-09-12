@@ -1,4 +1,4 @@
-import { Body, Controller, HttpCode, HttpException, HttpStatus, Post, Res, ValidationPipe } from '@nestjs/common';
+import { Body, Controller, HttpCode, HttpException, HttpStatus, Post, Res, UseGuards, ValidationPipe } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { ApiTags } from '@nestjs/swagger';
 import { compare, hash } from 'bcrypt';
@@ -7,6 +7,7 @@ import { UserService } from 'src/user/user.service';
 import { LoginUserDto } from './dto/login-user.dto';
 import { UserRole } from 'src/user/entities/user.entity';
 import { RegisterUserDto } from './dto/register-user.dto';
+import { AuthenticationGuard } from 'src/guards/authentication.guard';
 
 @Controller('api/auth')
 @ApiTags('auth')
@@ -42,7 +43,7 @@ export class AuthController {
         throw new HttpException("username or password is wrong", HttpStatus.BAD_REQUEST)
         }
 
-        const token = await this.jwtService.signAsync({id: user.id})
+        const token = await this.jwtService.signAsync({id: user.id, role: user.role})
 
         // set cookie
         res.cookie("token", token, {
@@ -54,6 +55,7 @@ export class AuthController {
         return {message: "Login successful", token}
     }
 
+    @UseGuards(AuthenticationGuard)
     @Post('logout')
     @HttpCode(200)
     async logout(@Res({passthrough: true}) res: Response) {

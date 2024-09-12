@@ -4,16 +4,20 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { ApiTags } from '@nestjs/swagger';
 import { hash } from 'bcrypt';
-import { AuthGuard } from 'src/guards/auth.guard';
+import { AuthenticationGuard } from 'src/guards/authentication.guard';
+import { Role } from 'src/decorators/roles.decorator';
+import { AuthorizationGuard } from 'src/guards/authorization.guard';
 
-@UseGuards(AuthGuard)
+@UseGuards(AuthenticationGuard)
 @Controller('api/users')
 @ApiTags('user')
 export class UserController {
   constructor(
     private readonly userService: UserService,
   ) {}
-
+  
+  @Role('admin')
+  @UseGuards(AuthorizationGuard)
   @Post()
   async create(@Body(new ValidationPipe()) createUserDto: CreateUserDto) {
     const user = await this.userService.findByUsername(createUserDto.username)
@@ -26,12 +30,14 @@ export class UserController {
     await this.userService.create(data)
     return {message: "User created successfully"};
   }
-
+  
+  @Role('admin')
+  @UseGuards(AuthorizationGuard)
   @Get()
   async findAll() {
     return await this.userService.findAll();
   }
-
+  
   @Get(':id')
   async findOne(@Param('id', ParseIntPipe) id: number) {
     const user = await this.userService.findOne(id)
@@ -41,6 +47,8 @@ export class UserController {
     return user;
   }
 
+  @Role('user')
+  @UseGuards(AuthorizationGuard)
   @Patch(':id')
   async update(@Param('id', ParseIntPipe) id: number, @Body(new ValidationPipe()) updateUserDto: UpdateUserDto) {
     const data = {...updateUserDto}
