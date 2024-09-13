@@ -12,18 +12,20 @@ export class ReservationService {
   constructor(@InjectRepository(Reservation) private readonly reservationRepository: Repository<Reservation>) {}
 
   async create(createReservationDto: CreateReservationDto, room: Room, user: User) {
-    const newReservation = {...createReservationDto}
-    newReservation.roomId = room.id
-    newReservation.userId = user.id
-    return await this.reservationRepository.save(newReservation);
+    
+    const newReservation = await this.reservationRepository.save({...createReservationDto, user, room}, {})
+    console.log(newReservation)
+    room.reservations = [newReservation, ...room.reservations]
+    user.reservations = [newReservation, ...user.reservations]
+    return newReservation;
   }
 
   async findAll(): Promise<Reservation[]> {
-    return await this.reservationRepository.find();
+    return await this.reservationRepository.find({relations: {user: true, room: true}});
   }
 
   async findOne(id: number): Promise<Reservation> {
-    return await this.reservationRepository.findOneBy({id});
+    return await this.reservationRepository.findOneBy({id, user: true, room: true});
   }
 
   async update(id: number, updateReservationDto: UpdateReservationDto) {

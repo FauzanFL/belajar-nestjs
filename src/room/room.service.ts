@@ -14,11 +14,11 @@ export class RoomService {
   }
 
   async findAll(): Promise<Room[]> {
-    return await this.roomRepository.find()
+    return await this.roomRepository.find({order: {id: "DESC"}})
   }
 
   async findOne(id: number): Promise<Room> {
-    return await this.roomRepository.findOneBy({id});
+    return await this.roomRepository.findOneBy({id, reservations: true});
   }
 
   async update(id: number, updateRoomDto: UpdateRoomDto) {

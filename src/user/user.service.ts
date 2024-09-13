@@ -14,11 +14,11 @@ export class UserService {
   }
 
   async findAll(): Promise<User[]> {
-    return await this.userRepository.find();
+    return await this.userRepository.find({relations: {reservations: true}});
   }
 
   async findOne(id: number): Promise<User> {
-    return await this.userRepository.findOneBy({id});
+    return await this.userRepository.findOneBy({id, reservations: true});
   }
 
   async findByUsername(username: string): Promise<User> {

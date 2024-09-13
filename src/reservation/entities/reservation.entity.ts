@@ -25,9 +25,9 @@ export class Reservation {
     @CreateDateColumn({type: "timestamp"})
     end: Date
 
-    @ManyToOne(() => Room, (room) => room.reservations)
+    @ManyToOne(() => Room, (room) => room.reservations, {nullable: false})
     room: Room
 
-    @ManyToOne(() => User, (user) => user.reservations)
+    @ManyToOne(() => User, (user) => user.reservations, {nullable: false})
     user: User
 }
