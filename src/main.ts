@@ -15,6 +15,7 @@ async function bootstrap() {
   .setTitle("Room reservation")
   .setDescription("API for room reservation")
   .setVersion("1.0")
+  .addBearerAuth()
   .build();
 
   const document = SwaggerModule.createDocument(app, config);

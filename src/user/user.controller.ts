@@ -2,7 +2,7 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe, HttpEx
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { hash } from 'bcrypt';
 import { AuthenticationGuard } from 'src/guards/authentication.guard';
 import { Role } from 'src/decorators/roles.decorator';
@@ -11,6 +11,7 @@ import { AuthorizationGuard } from 'src/guards/authorization.guard';
 @UseGuards(AuthenticationGuard)
 @Controller('api/users')
 @ApiTags('user')
+@ApiBearerAuth()
 export class UserController {
   constructor(
     private readonly userService: UserService,

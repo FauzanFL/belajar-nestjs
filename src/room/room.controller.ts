@@ -2,7 +2,7 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe, HttpEx
 import { RoomService } from './room.service';
 import { CreateRoomDto } from './dto/create-room.dto';
 import { UpdateRoomDto } from './dto/update-room.dto';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { AuthenticationGuard } from 'src/guards/authentication.guard';
 import { Role } from 'src/decorators/roles.decorator';
 import { AuthorizationGuard } from 'src/guards/authorization.guard';
@@ -14,6 +14,7 @@ export class RoomController {
   
   @Role('admin')
   @UseGuards(AuthenticationGuard, AuthorizationGuard)
+  @ApiBearerAuth()
   @Post()
   async create(@Body(new ValidationPipe()) createRoomDto: CreateRoomDto) {
     const data = {...createRoomDto, ready: true}
@@ -37,6 +38,7 @@ export class RoomController {
 
   @Role('admin')
   @UseGuards(AuthenticationGuard, AuthorizationGuard)
+  @ApiBearerAuth()
   @Patch(':id')
   async update(@Param('id', ParseIntPipe) id: number, @Body(new ValidationPipe()) updateRoomDto: UpdateRoomDto) {
     const room = await this.roomService.findOne(id)
@@ -49,6 +51,7 @@ export class RoomController {
 
   @Role('admin')
   @UseGuards(AuthenticationGuard, AuthorizationGuard)
+  @ApiBearerAuth()
   @Delete(':id')
   async remove(@Param('id', ParseIntPipe) id: number) {
     const room = await this.roomService.findOne(id)
