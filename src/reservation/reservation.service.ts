@@ -13,11 +13,17 @@ export class ReservationService {
 
   async create(createReservationDto: CreateReservationDto, room: Room, user: User) {
     
-    const newReservation = await this.reservationRepository.save({...createReservationDto, user, room}, {})
-    console.log(newReservation)
-    room.reservations = [newReservation, ...room.reservations]
-    user.reservations = [newReservation, ...user.reservations]
-    return newReservation;
+    const newReservation = await this.reservationRepository.create({
+      date: createReservationDto.date,
+      duration: createReservationDto.duration,
+      phone: createReservationDto.phone,
+      start: createReservationDto.start,
+      end: createReservationDto.end,
+      total: createReservationDto.total,
+      user,
+      room
+    })
+    return await this.reservationRepository.save(newReservation);
   }
 
   async findAll(): Promise<Reservation[]> {
